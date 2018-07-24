@@ -4,10 +4,20 @@ const mongoose = require('mongoose')
 const db = require('./config/keys');
 const PORT = process.env.PORT || 5000;
 
+//Import routes
+const users = require('./routes/api/users');
+const profile = require('./routes/api/profile');
+const posts = require('./routes/api/posts');
+
 mongoose
     .connect(db.mongoURI, { useNewUrlParser: true })
     .then(() => { console.log('Successfully connected to the database') })
     .catch(err => console.log(err))
+
+//Routes middleware
+app.use('/api/users', users)
+app.use('/api/profile', profile)
+app.use('/api/posts', posts)
 
 app.listen(PORT, () => {
     console.log(`Server started at port ${PORT}`)
