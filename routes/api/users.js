@@ -5,11 +5,18 @@ const gravatar = require('gravatar')
 const jwt = require('jsonwebtoken');
 const keys = require('../../config/keys')
 const passport = require('passport')
+const validateRegisterInput = require('../../validation/register')
 
 // @@ POST api/users/register
 // @@ desc Register User
 // @@ access Public
 router.post('/register', (req, res) => {
+    const {errors, isValid} = validateRegisterInput(req.body);
+
+    if(!isValid){
+        return res.status(400).json(errors)
+    }
+
     User.findOne({ email: req.body.email })
         .then(user => {
             if (user) {
@@ -24,7 +31,7 @@ router.post('/register', (req, res) => {
                 })
                 bcrypt.genSalt(10, (err, salt) => {
                     bcrypt.hash(newUser.password, salt, (err, hash) => {
-                        if (err) throw err;
+                        if (err) console.log(err);
                         newUser.password = hash;
                         newUser.save()
                             .then(user => res.json(user))
