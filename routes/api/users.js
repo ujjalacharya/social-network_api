@@ -2,6 +2,8 @@ const router = require('express').Router();
 const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
 const gravatar = require('gravatar')
+const jwt = require('jsonwebtoken');
+const keys = require('../../config/keys')
 
 // @@ POST api/users/register
 // @@ desc Register User
@@ -45,7 +47,17 @@ router.post('/login', (req, res)=>{
                 bcrypt.compare(req.body.password, user.password)
                     .then(isMatch => {
                         if(isMatch){
-                            res.status(200).json("Success")
+                            const payload = {id: user.id, name: user.name, avatar: user.avatar}
+
+                            jwt.sign(payload,
+                                 keys.secret,
+                                  {expiresIn: 3600},
+                                (err, token)=>{
+                                    res.json({
+                                        success: true,
+                                        token: 'Bearer '+token
+                                    })
+                                })
                         }else{
                             res.status(400).json({password: 'Incorrect password'})
                         }
