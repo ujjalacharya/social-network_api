@@ -1,14 +1,15 @@
-const express = require('express');
-const app = express();
-const mongoose = require('mongoose')
-const db = require('./config/keys');
-const PORT = process.env.PORT || 5000;
+const express    = require('express');
+const app        = express();
+const mongoose   = require('mongoose')
+const db         = require('./config/keys');
+const PORT       = process.env.PORT || 5000;
 
 //Import routes
 const users = require('./routes/api/users');
 const profile = require('./routes/api/profile');
 const posts = require('./routes/api/posts');
 
+//Database connection
 mongoose
     .connect(db.mongoURI, { useNewUrlParser: true })
     .then(() => { console.log('Successfully connected to the database') })
@@ -19,6 +20,7 @@ app.use('/api/users', users)
 app.use('/api/profile', profile)
 app.use('/api/posts', posts)
 
+//Server start
 app.listen(PORT, () => {
     console.log(`Server started at port ${PORT}`)
 })
