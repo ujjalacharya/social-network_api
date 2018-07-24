@@ -2,6 +2,7 @@ const express    = require('express');
 const app        = express();
 const mongoose   = require('mongoose')
 const db         = require('./config/keys');
+const bodyParser= require('body-parser')
 const PORT       = process.env.PORT || 5000;
 
 //Import routes
@@ -14,6 +15,10 @@ mongoose
     .connect(db.mongoURI, { useNewUrlParser: true })
     .then(() => { console.log('Successfully connected to the database') })
     .catch(err => console.log(err))
+
+//BodyParser middleware
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
 //Routes middleware
 app.use('/api/users', users)
