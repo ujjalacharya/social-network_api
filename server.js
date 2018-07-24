@@ -3,6 +3,7 @@ const app        = express();
 const mongoose   = require('mongoose')
 const db         = require('./config/keys');
 const bodyParser = require('body-parser')
+const passport   = require('passport');
 const PORT       = process.env.PORT || 5000;
 
 //Import routes
@@ -19,6 +20,10 @@ mongoose
 //BodyParser middleware
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+
+//Passport middleware
+app.use(passport.initialize());
+require('./config/passport')(passport);
 
 //Routes middleware
 app.use('/api/users', users)
