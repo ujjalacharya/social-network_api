@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const keys = require('../../config/keys')
 const passport = require('passport')
 const validateRegisterInput = require('../../validation/register')
+const validateLoginInput = require('../../validation/login')
 
 // @@ POST api/users/register
 // @@ desc Register User
@@ -20,7 +21,8 @@ router.post('/register', (req, res) => {
     User.findOne({ email: req.body.email })
         .then(user => {
             if (user) {
-                res.status(400).json({ email: 'Email already exists' })
+                errors.email = 'Email already exists'
+                res.status(400).json(errors)
             } else {
                 let avatar = gravatar.url(req.body.email, { s: '200', r: 'pg', d: 'mm' });
                 let newUser = new User({
@@ -47,10 +49,16 @@ router.post('/register', (req, res) => {
 // @@ desc Logs in User
 // @@ access Public
 router.post('/login', (req, res) => {
+    const {errors, isValid} = validateLoginInput(req.body);
+
+    if(!isValid){
+        return res.status(400).json(errors)
+    } 
     User.findOne({ email: req.body.email })
         .then(user => {
             if (!user) {
-                res.status(404).json({ email: 'User not found' })
+                errors.email = 'User not found'
+                res.status(404).json(errors)
             } else {
                 bcrypt.compare(req.body.password, user.password)
                     .then(isMatch => {
@@ -67,7 +75,8 @@ router.post('/login', (req, res) => {
                                     })
                                 })
                         } else {
-                            res.status(400).json({ password: 'Incorrect password' })
+                            errors.password = 'Incorrect password'
+                            res.status(400).json(errors)
                         }
                     });
             }
