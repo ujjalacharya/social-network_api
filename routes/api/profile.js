@@ -2,6 +2,8 @@ const router = require('express').Router();
 const Profile = require('../../models/Profile');
 const passport = require('passport');
 const validateProfile = require('../../validation/profile');
+const validateExperience = require('../../validation/experience');
+const validateEducation = require('../../validation/education');
 
 router.get('/test', (req, res) => {
     res.json({ test: 'Profile route work' })
@@ -126,6 +128,58 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
                         }
                     })
             }
+        })
+})
+
+// @@ POST api/profile/experience
+// @@ desc insert experince info
+// @@ access Private
+router.post('/experience',passport.authenticate('jwt', {session: false}), (req, res)=>{
+    const {errors, isValid} = validateExperience(req.body);
+
+    if(!isValid){
+        return res.status(400).json(errors)
+    }
+    Profile.findOne({user: req.user.id})
+        .then(profile=>{
+            const newExp = {
+                title: req.body.title,
+                company: req.body.company,
+                location: req.body.location,
+                to: req.body.to,
+                from: req.body.from,
+                current: req.body.current,
+                description: req.body.description
+            }
+            profile.experience.unshift(newExp);
+            profile.save()
+                .then(profile => res.status(200).json(profile))
+        })
+})
+
+// @@ POST api/profile/education
+// @@ desc insert education info
+// @@ access Private
+router.post('/education', passport.authenticate('jwt', {session: false}), (req, res)=>{
+    const {errors, isValid} = validateEducation(req.body);
+
+    if(!isValid){
+        return res.status(400).json(errors)
+    }
+    Profile.findOne({user: req.user.id})
+        .then(profile=>{
+            const newEd = {
+                school: req.body.school,
+                degree: req.body.degree,
+                fieldofstudy: req.body.fieldofstudy,
+                from: req.body.from,
+                to: req.body.to,
+                current: req.body.current,
+                description: req.body.description,
+            }
+            profile.education.unshift(newEd);
+            profile.save()
+                .then(profile => res.status(200).json(profile))
         })
 })
 
