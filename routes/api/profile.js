@@ -7,6 +7,56 @@ router.get('/test', (req, res) => {
     res.json({ test: 'Profile route work' })
 })
 
+// @@ GET api/profile/all
+// @@ desc Get all users' profile
+// @@ access Public
+router.get('/all', (req, res)=>{
+    const errors = {}
+    Profile.find()
+    .populate('user', ['name', 'avatar'])
+        .then(profiles =>{
+            if(!profiles){
+                errors.profiles = 'No profiles found'
+                return res.status(404).json(errors)
+            }
+            res.status(200).json(profiles)
+        })
+        .catch(err => res.status(404).json(err))
+})
+
+// @@ GET api/profile/handle
+// @@ desc Get a profile by handle
+// @@ access Public
+router.get('/handle/:handle', (req, res)=>{
+    const errors = {}
+    Profile.findOne({handle: req.params.handle})
+        .then(profile=>{
+            if(!profile){
+                errors.handle = 'No such handle found'
+                return res.status(404).json(errors)
+            }
+            return res.status(200).json(profile);
+        })
+        .catch(err => res.status(404).json(err))
+})
+
+// @@ GET api/profile/user/id
+// @@ desc Get a profile by id
+// @@ access Public
+router.get('/user/:user_id', (req, res)=>{
+    const errors = {}
+    Profile.findOne({user: req.params.user_id})
+        .then(profile=>{
+            if(!profile){
+                errors.handle = 'No profile for that id'
+                return res.status(404).json(errors)
+            }
+            return res.status(200).json(profile);
+        })
+        .catch(err => res.status(404).json({profile: 'No profile for that id'}))
+})
+
+
 // @@ GET api/profile
 // @@ desc Get current user's profile
 // @@ access Private
